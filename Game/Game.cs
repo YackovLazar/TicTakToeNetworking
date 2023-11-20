@@ -7,6 +7,13 @@ namespace Game
 {
     public partial class Game : Form
     {
+        private readonly char PlayerChar;
+        private readonly char OpponentChar;
+        private readonly Socket sock;
+        private readonly BackgroundWorker MessageReceiver = new BackgroundWorker();
+        private readonly TcpListener server = null;
+        private readonly TcpClient client;
+
         public Game(bool isHost, string ip = null)
         {
             InitializeComponent();
@@ -17,9 +24,16 @@ namespace Game
             {
                 PlayerChar = 'X';
                 OpponentChar = 'O';
-                server = new TcpListener(System.Net.IPAddress.Any, 5732);
-                server.Start();
-                sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
+                try
+                {
+                    server = new TcpListener(System.Net.IPAddress.Any, 8080);
+                    server.Start();
+                    sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
+                }catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    Close();
+                }
             }
             else
             {
@@ -27,7 +41,7 @@ namespace Game
                 OpponentChar = 'X';
                 try
                 {
-                    client = new TcpClient(ip, 5732); //We are the 'guest'
+                    client = new TcpClient(ip, 8080); //We are the 'guest'
                     sock = client.Client;
                     MessageReceiver.RunWorkerAsync(); //To recieve the move of the opponent. This will call the DoWork method
                 }
@@ -41,22 +55,15 @@ namespace Game
 
         private void MessageReceiver_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (CheckState()) //If true, it means the game is over
+            if (CheckState()) // If true, it means the game is over
                 return;
-            FreezeBoard(); //To allow the opponent to move
+            FreezeBoard(); // To allow the opponent to move
             label1.Text = "Opponent's Turn!";
             ReceiveMove();
-            label1.Text = "Your Trun!";
+            label1.Text = "Your Turn!";
             if (!CheckState())
                 UnfreezeBoard();
         }
-
-        private char PlayerChar;
-        private char OpponentChar;
-        private Socket sock;
-        private BackgroundWorker MessageReceiver = new BackgroundWorker();
-        private TcpListener server = null;
-        private TcpClient client;
 
         private bool CheckState()
         {
@@ -253,7 +260,7 @@ namespace Game
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             byte[] num = { 1 };
             sock.Send(num);
@@ -261,7 +268,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             byte[] num = { 2 };
             sock.Send(num);
@@ -269,7 +276,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
             byte[] num = { 3 };
             sock.Send(num);
@@ -277,7 +284,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void Button4_Click(object sender, EventArgs e)
         {
             byte[] num = { 4 };
             sock.Send(num);
@@ -285,7 +292,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void Button5_Click(object sender, EventArgs e)
         {
             byte[] num = { 5 };
             sock.Send(num);
@@ -293,7 +300,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void Button6_Click(object sender, EventArgs e)
         {
             byte[] num = { 6 };
             sock.Send(num);
@@ -301,7 +308,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void Button7_Click(object sender, EventArgs e)
         {
             byte[] num = { 7 };
             sock.Send(num);
@@ -309,7 +316,7 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void Button8_Click(object sender, EventArgs e)
         {
             byte[] num = { 8 };
             sock.Send(num);
@@ -317,17 +324,12 @@ namespace Game
             MessageReceiver.RunWorkerAsync();
         }
 
-        private void button9_Click(object sender, EventArgs e)
+        private void Button9_Click(object sender, EventArgs e)
         {
             byte[] num = { 9 };
             sock.Send(num);
             button9.Text = PlayerChar.ToString();
             MessageReceiver.RunWorkerAsync();
-        }
-
-        private void Game_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void Game_FormClosing(object sender, FormClosingEventArgs e)
