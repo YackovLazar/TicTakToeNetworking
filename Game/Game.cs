@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
@@ -344,7 +345,7 @@ namespace Game
                 server.Stop();
         }
 
-        private void LoadGame_Clicked(object sender, EventArgs e)
+        private void LoadGame_Clicked<T>(object sender, EventArgs e)
         {
             if (savedGame == null)
                 return;
@@ -369,8 +370,8 @@ namespace Game
                     property.SetValue(obj, kvp.Value);
                 }
             }
-
-            return obj;
+            //todo - set the buttons to the values of the object
+           // savedGame = obj.ToString();
 
         }
 
@@ -391,15 +392,27 @@ namespace Game
             {
                 // Get the value of the property for the current object
                 object value = property.GetValue(sender);
-
+                // Check if the property type is IntPtr and exclude it
+                if (value != null && value.GetType() == typeof(IntPtr))
+                {
+                    continue; // Skip properties of type IntPtr
+                }
                 // Add the property name and value to the dictionary
                 propertyValues.Add(property.Name, value);
             }
 
             // Serialize the dictionary to JSON using System.Text.Json.JsonSerializer
+            string test = "";
+            foreach (var VARIABLE in propertyValues)
+            {
+                test += ($"Key: {VARIABLE.Key}, Value: {VARIABLE.Value}");
+            }
+            MessageBox.Show(test);
+
             string json = JsonSerializer.Serialize(propertyValues);
 
             savedGame = json;
+            MessageBox.Show(savedGame);
         }
     }
 }
