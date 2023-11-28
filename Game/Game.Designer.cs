@@ -152,6 +152,7 @@
             LoadGame.TabIndex = 10;
             LoadGame.Text = "Load Game";
             LoadGame.UseVisualStyleBackColor = true;
+            LoadGame.Click += LoadGame_Clicked;
             // 
             // SaveGame
             // 
@@ -161,6 +162,7 @@
             SaveGame.TabIndex = 11;
             SaveGame.Text = "Save Game";
             SaveGame.UseVisualStyleBackColor = true;
+            SaveGame.Click += SaveGame_Clicked;
             // 
             // Game
             // 

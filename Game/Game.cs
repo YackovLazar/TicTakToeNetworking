@@ -339,5 +339,15 @@ namespace Game
             if (server != null) //ie we are hosting the server
                 server.Stop();
         }
+
+        private void LoadGame_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SaveGame_Clicked(Object sender, EventArgs e)
+        {
+
+        }
     }
 }
