@@ -2,11 +2,16 @@
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 
 namespace Game
 {
     public partial class Game : Form
     {
+        private string savedGame;
         private readonly char PlayerChar;
         private readonly char OpponentChar;
         private readonly Socket sock;
@@ -29,7 +34,8 @@ namespace Game
                     server = new TcpListener(System.Net.IPAddress.Any, 8080);
                     server.Start();
                     sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                     Close();
@@ -340,14 +346,74 @@ namespace Game
                 server.Stop();
         }
 
-        private void LoadGame_Clicked(object sender, EventArgs e)
+        private void LoadGame_Clicked<T>(object sender, EventArgs e)
         {
+            if (savedGame == null)
+                return;
+            // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
+            var propertyValues = JsonSerializer.Deserialize<Dictionary<string, object>>(savedGame);
+
+            // Create an instance of the target type
+            T obj = Activator.CreateInstance<T>();
+
+            // Get the type of the object
+            Type objectType = typeof(T);
+
+            // Set the properties of the object using reflection
+            foreach (var kvp in propertyValues)
+            {
+                // Find the property by name
+                PropertyInfo property = objectType.GetProperty(kvp.Key);
+
+                // Set the value of the property for the target object
+                if (property != null)
+                {
+                    property.SetValue(obj, kvp.Value);
+                }
+            }
+            //todo - set the buttons to the values of the object
+            // savedGame = obj.ToString();
 
         }
 
         private void SaveGame_Clicked(Object sender, EventArgs e)
         {
 
+            // Get the type of the object
+            Type objectType = sender.GetType();
+
+            // Get the properties of the object using reflection
+            PropertyInfo[] properties = objectType.GetProperties();
+
+            // Create a dictionary to store property names and values
+            var propertyValues = new Dictionary<string, object>();
+
+            // Populate the dictionary with property names and values
+            foreach (PropertyInfo property in properties)
+            {
+                // Get the value of the property for the current object
+                object value = property.GetValue(sender);
+                // Check if the property type is IntPtr and exclude it
+                if (value != null && value.GetType() == typeof(IntPtr))
+                {
+                    continue; // Skip properties of type IntPtr
+                }
+                // Add the property name and value to the dictionary
+                propertyValues.Add(property.Name, value);
+            }
+
+            // Serialize the dictionary to JSON using System.Text.Json.JsonSerializer
+            string test = "";
+            foreach (var VARIABLE in propertyValues)
+            {
+                test += ($"Key: {VARIABLE.Key}, Value: {VARIABLE.Value}");
+            }
+            MessageBox.Show(test);
+
+            string json = JsonSerializer.Serialize(propertyValues);
+
+            savedGame = json;
+            MessageBox.Show(savedGame);
         }
     }
 }
