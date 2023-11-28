@@ -2,11 +2,15 @@
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.ComponentModel;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.Json;
 
 namespace Game
 {
     public partial class Game : Form
     {
+        private string savedGame;
         private readonly char PlayerChar;
         private readonly char OpponentChar;
         private readonly Socket sock;
@@ -342,12 +346,60 @@ namespace Game
 
         private void LoadGame_Clicked(object sender, EventArgs e)
         {
+            if (savedGame == null)
+                return;
+            // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
+            var propertyValues = JsonSerializer.Deserialize<Dictionary<string, object>>(savedGame);
+
+            // Create an instance of the target type
+             T obj = Activator.CreateInstance<T>();
+
+            // Get the type of the object
+            Type objectType = typeof(T);
+
+            // Set the properties of the object using reflection
+            foreach (var kvp in propertyValues)
+            {
+                // Find the property by name
+                PropertyInfo property = objectType.GetProperty(kvp.Key);
+
+                // Set the value of the property for the target object
+                if (property != null)
+                {
+                    property.SetValue(obj, kvp.Value);
+                }
+            }
+
+            return obj;
 
         }
 
         private void SaveGame_Clicked(Object sender, EventArgs e)
         {
+            
+            // Get the type of the object
+            Type objectType = sender.GetType();
 
+            // Get the properties of the object using reflection
+            PropertyInfo[] properties = objectType.GetProperties();
+
+            // Create a dictionary to store property names and values
+            var propertyValues = new Dictionary<string, object>();
+
+            // Populate the dictionary with property names and values
+            foreach (PropertyInfo property in properties)
+            {
+                // Get the value of the property for the current object
+                object value = property.GetValue(sender);
+
+                // Add the property name and value to the dictionary
+                propertyValues.Add(property.Name, value);
+            }
+
+            // Serialize the dictionary to JSON using System.Text.Json.JsonSerializer
+            string json = JsonSerializer.Serialize(propertyValues);
+
+            savedGame = json;
         }
     }
 }
