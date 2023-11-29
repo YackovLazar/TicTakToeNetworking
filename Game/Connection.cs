@@ -27,6 +27,5 @@ namespace Game
                 newGame.ShowDialog();
             Visible = true;
         }
-
     }
 }
