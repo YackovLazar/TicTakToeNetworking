@@ -34,7 +34,18 @@ namespace Game
                     server = new TcpListener(System.Net.IPAddress.Any, 8080);
                     server.Start();
                     sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
-                }catch(Exception ex)
+                                                  
+                    // Get the network stream
+                    NetworkStream stream = client.GetStream();
+
+                    // Send a string to the client
+                    string messageToSend = "Hello, client!";
+                    byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
+                    stream.Write(messageBytes, 0, messageBytes.Length);
+                    Console.WriteLine($"Received from server: {messageToSend}");
+
+                }
+                catch(Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                     Close();
@@ -48,6 +59,7 @@ namespace Game
                 {
                     client = new TcpClient(ip, 8080); //We are the 'guest'
                     sock = client.Client;
+
                     MessageReceiver.RunWorkerAsync(); //To recieve the move of the opponent. This will call the DoWork method
                 }
                 catch (Exception ex)
@@ -68,6 +80,16 @@ namespace Game
             label1.Text = "Your Turn!";
             if (!CheckState())
                 UnfreezeBoard();
+
+            // Get the network stream
+            NetworkStream stream = client.GetStream();
+
+            // Receive a string from the server
+            byte[] receiveBuffer = new byte[1024];
+            int bytesRead = stream.Read(receiveBuffer, 0, receiveBuffer.Length);
+            string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
+            Console.WriteLine($"Received from server: {receivedMessage}");
+
         }
 
         private bool CheckState()
