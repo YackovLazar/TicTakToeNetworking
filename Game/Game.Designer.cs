@@ -152,7 +152,7 @@
             LoadGame.TabIndex = 10;
             LoadGame.Text = "Load Game";
             LoadGame.UseVisualStyleBackColor = true;
-            LoadGame.Click += LoadGame_Clicked<string>;
+            LoadGame.Click += LoadGame_Clicked;
             // 
             // SaveGame
             // 

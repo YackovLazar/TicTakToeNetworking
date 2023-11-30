@@ -361,33 +361,66 @@ namespace Game
                 server.Stop();
         }
 
-        private void LoadGame_Clicked<T>(object sender, EventArgs e)
+        private void LoadGame_Clicked(object sender, EventArgs e)
         {
             if (savedGame == null)
                 return;
             // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
-            var propertyValues = JsonSerializer.Deserialize<Dictionary<string, object>>(savedGame);
-
-            // Create an instance of the target type
-             T obj = Activator.CreateInstance<T>();
-
-            // Get the type of the object
-            Type objectType = typeof(T);
-
-            // Set the properties of the object using reflection
-            foreach (var kvp in propertyValues)
+            List<ButtonInfo> deserializedList = JsonSerializer.Deserialize<List<ButtonInfo>>(savedGame);
+            string name;
+            foreach (ButtonInfo b in deserializedList)
             {
-                // Find the property by name
-                PropertyInfo property = objectType.GetProperty(kvp.Key);
-
-                // Set the value of the property for the target object
-                if (property != null)
+                name = b.Name;
+                if (name == "button1")
                 {
-                    property.SetValue(obj, kvp.Value);
+                    button1.Text = b.Text;
+                    button1.Enabled = false;
+                }
+                else if (name == "button2")
+                {
+                    button2.Text = b.Text;
+                    button2.Enabled = false;
+                }
+                else if (name == "button3")
+                {
+                    button3.Text = b.Text;
+                    button3.Enabled = false;
+                }
+                else if (name == "button4")
+                {
+                    button4.Text = b.Text;
+                    button4.Enabled = false;
+                }
+                else if (name == "button5")
+                {
+                    button5.Text = b.Text;
+                    button5.Enabled = false;
+                }
+                else if (name == "button6")
+                {
+                    button6.Text = b.Text;
+                    button6.Enabled = false;
+                }
+                else if (name == "button7")
+                {
+                    button7.Text = b.Text;
+                    button7.Enabled = false;
+                }
+                else if (name == "button8")
+                {
+                    button8.Text = b.Text;
+                    button8.Enabled = false;
+                }
+                else if (name == "button9")
+                {
+                    button9.Text = b.Text;
+                    button9.Enabled = false;
+                }
+                else
+                {
+                    // code to be executed if none of the conditions match
                 }
             }
-            //todo - set the buttons to the values of the object
-            // savedGame = obj.ToString();
 
             // Send a string to the client
             string messageToSend = "Hello, client!";
@@ -399,42 +432,29 @@ namespace Game
 
         private void SaveGame_Clicked(Object sender, EventArgs e)
         {
-            
-            // Get the type of the object
-            Type objectType = sender.GetType();
-
-            // Get the properties of the object using reflection
-            PropertyInfo[] properties = objectType.GetProperties();
-
-            // Create a dictionary to store property names and values
-            var propertyValues = new Dictionary<string, object>();
-
-            // Populate the dictionary with property names and values
-            foreach (PropertyInfo property in properties)
+            List<ButtonInfo> buttonInfoList = new List<ButtonInfo>();
+            IContainer c = this.components;
+            foreach (var comp in c.Components)
             {
-                // Get the value of the property for the current object
-                object value = property.GetValue(sender);
-                // Check if the property type is IntPtr and exclude it
-                if (value != null && value.GetType() == typeof(IntPtr))
+                if (comp is Button)
                 {
-                    continue; // Skip properties of type IntPtr
+                    Button b = (Button)comp;
+                    buttonInfoList.Add(new ButtonInfo { Name = b.Name, Text = b.Text });
                 }
-                // Add the property name and value to the dictionary
-                propertyValues.Add(property.Name, value);
             }
 
-            // Serialize the dictionary to JSON using System.Text.Json.JsonSerializer
-            string test = "";
-            foreach (var VARIABLE in propertyValues)
-            {
-                test += ($"Key: {VARIABLE.Key}, Value: {VARIABLE.Value}");
-            }
-            MessageBox.Show(test);
+            // Serialize the list to JSON
+            string json = JsonSerializer.Serialize(buttonInfoList);
 
-            string json = JsonSerializer.Serialize(propertyValues);
-
-            savedGame = json;
+            // Deserialize the JSON back to the list
             MessageBox.Show(savedGame);
         }
+        // Define a class to represent the information you want to serialize
+        public class ButtonInfo
+        {
+            public string Name { get; set; }
+            public string Text { get; set; }
+        }
+      
     }
 }
