@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text;
 
 namespace Game
 {
@@ -18,6 +19,7 @@ namespace Game
         private readonly BackgroundWorker MessageReceiver = new BackgroundWorker();
         private readonly TcpListener server = null;
         private readonly TcpClient client;
+        private readonly NetworkStream stream;
 
         public Game(bool isHost, string ip = null)
         {
@@ -34,15 +36,7 @@ namespace Game
                     server = new TcpListener(System.Net.IPAddress.Any, 8080);
                     server.Start();
                     sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
-                                                  
-                    // Get the network stream
-                    NetworkStream stream = client.GetStream();
 
-                    // Send a string to the client
-                    string messageToSend = "Hello, client!";
-                    byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
-                    stream.Write(messageBytes, 0, messageBytes.Length);
-                    Console.WriteLine($"Received from server: {messageToSend}");
 
                 }
                 catch(Exception ex)
@@ -59,6 +53,9 @@ namespace Game
                 {
                     client = new TcpClient(ip, 8080); //We are the 'guest'
                     sock = client.Client;
+
+                    // Get the network stream
+                    NetworkStream stream = client.GetStream();
 
                     MessageReceiver.RunWorkerAsync(); //To recieve the move of the opponent. This will call the DoWork method
                 }
@@ -80,9 +77,6 @@ namespace Game
             label1.Text = "Your Turn!";
             if (!CheckState())
                 UnfreezeBoard();
-
-            // Get the network stream
-            NetworkStream stream = client.GetStream();
 
             // Receive a string from the server
             byte[] receiveBuffer = new byte[1024];
@@ -393,7 +387,13 @@ namespace Game
                 }
             }
             //todo - set the buttons to the values of the object
-           // savedGame = obj.ToString();
+            // savedGame = obj.ToString();
+
+            // Send a string to the client
+            string messageToSend = "Hello, client!";
+            byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
+            stream.Write(messageBytes, 0, messageBytes.Length);
+            Console.WriteLine($"Received from server: {messageToSend}");
 
         }
 
