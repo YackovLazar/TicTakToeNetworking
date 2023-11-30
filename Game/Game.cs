@@ -364,7 +364,29 @@ namespace Game
         private void LoadGame_Clicked(object sender, EventArgs e)
         {
             if (savedGame == null)
+            {
+                MessageBox.Show("No saved game found");
                 return;
+            }
+            button1.Text = "";
+            button2.Text = "";
+            button3.Text = "";
+            button4.Text = "";
+            button5.Text = "";
+            button6.Text = "";
+            button7.Text = "";
+            button8.Text = "";
+            button9.Text = "";
+            button1.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+            button4.Enabled = true;
+            button5.Enabled = true;
+            button6.Enabled = true;
+            button7.Enabled = true;
+            button8.Enabled = true;
+            button9.Enabled = true;
+
             // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
             List<ButtonInfo> deserializedList = JsonSerializer.Deserialize<List<ButtonInfo>>(savedGame);
             string name;
@@ -433,12 +455,12 @@ namespace Game
         private void SaveGame_Clicked(Object sender, EventArgs e)
         {
             List<ButtonInfo> buttonInfoList = new List<ButtonInfo>();
-            IContainer c = this.components;
-            foreach (var comp in c.Components)
+           // IContainer c = this.components;
+            foreach (Control control in this.Controls)
             {
-                if (comp is Button)
+                if (control is Button)
                 {
-                    Button b = (Button)comp;
+                    Button b = (Button)control;
                     buttonInfoList.Add(new ButtonInfo { Name = b.Name, Text = b.Text });
                 }
             }
@@ -446,6 +468,7 @@ namespace Game
             // Serialize the list to JSON
             string json = JsonSerializer.Serialize(buttonInfoList);
 
+            savedGame = json;
             // Deserialize the JSON back to the list
             MessageBox.Show(savedGame);
         }
