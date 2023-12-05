@@ -81,13 +81,6 @@ namespace Game
             label1.Text = "Your Turn!";
             if (!CheckState())
                 UnfreezeBoard();
-
-            // Receive a string from the server
-            byte[] receiveBuffer = new byte[1024];
-            int bytesRead = stream.Read(receiveBuffer, 0, receiveBuffer.Length);
-            string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
-            Console.WriteLine($"Received from server: {receivedMessage}");
-
         }
 
         private void checkWinner(char input)
