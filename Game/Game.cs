@@ -221,7 +221,7 @@ namespace Game
 
             if (buffer[9] == 0)
             {
-                ReceiveMove(buffer[0]);
+                ReceiveMove(buffer);
                 return false;
             }
             else
@@ -232,11 +232,11 @@ namespace Game
 
 
 
-        private void ReceiveMove(byte receive)
+        private void ReceiveMove(byte[] receive)
         {
-            byte[] buffer = new byte[1];
-            sock.Receive(buffer);
-            buttons[buffer[0]-1].Text = OpponentChar.ToString();
+            for(int i = 0; i < receive.Length; i++)
+                if (receive[i] != 0)
+                    buttons[i].Text = OpponentChar.ToString();
         }
 
         private void Button1_Click(object sender, EventArgs e)
