@@ -86,127 +86,70 @@ namespace Game
 
         }
 
+        private void checkWinner(char input)
+        {
+            if (input.Equals(PlayerChar))
+            {
+                label1.Text = "You Won!";
+                MessageBox.Show("You Won!");
+            }
+            else
+            {
+                label1.Text = "You Lost!";
+                MessageBox.Show("You Lost!");
+            }
+        }
+
         private bool CheckState()
         {
             //Horizontals
             if (button1.Text == button2.Text && button2.Text == button3.Text && button3.Text != "")
             {
-                if (button1.Text[0] == PlayerChar) //Text[0] is the first char of the button
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button4.Text == button5.Text && button5.Text == button6.Text && button6.Text != "")
             {
-                if (button4.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button4.Text[0]);
                 return true;
             }
 
             else if (button7.Text == button8.Text && button8.Text == button9.Text && button9.Text != "")
             {
-                if (button7.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button7.Text[0]);
                 return true;
             }
 
             //Verticals
             else if (button1.Text == button4.Text && button4.Text == button7.Text && button7.Text != "")
             {
-                if (button1.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button2.Text == button5.Text && button5.Text == button8.Text && button8.Text != "")
             {
-                if (button2.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button2.Text[0]);
+                ;
                 return true;
             }
 
             else if (button3.Text == button6.Text && button6.Text == button9.Text && button9.Text != "")
             {
-                if (button3.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button3.Text[0]);
                 return true;
             }
 
             else if (button1.Text == button5.Text && button5.Text == button9.Text && button9.Text != "")
             {
-                if (button1.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button3.Text == button5.Text && button5.Text == button7.Text && button7.Text != "")
             {
-                if (button3.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button3.Text[0]);
                 return true;
             }
 
