@@ -9,9 +9,9 @@ namespace Game
         {
             String text = "";
             if (num == 1)
-                text = playerChar.ToString();
-            else if (num == 2)
                 text = opponentChar.ToString();
+            else if (num == 2)
+                text = playerChar.ToString();
 
             button.Text = text;
         }

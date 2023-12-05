@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoardBuilder.cs" />
+    <Compile Include="CommunicationExtentions.cs" />
     <Compile Include="Connection.cs">
       <SubType>Form</SubType>
     </Compile>

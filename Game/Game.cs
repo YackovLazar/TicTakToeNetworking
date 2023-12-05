@@ -37,7 +37,7 @@ namespace Game
                     server.Start();
                     sock = server.AcceptSocket(); //Accept the incoming connection and then asign the socket to the sock object which then can be used to recieve messages on this channel
 
-
+                    stream = new NetworkStream(sock);
                 }
                 catch(Exception ex)
                 {
@@ -69,18 +69,21 @@ namespace Game
 
         private void MessageReceiver_DoWork(object sender, DoWorkEventArgs e)
         {
+            ActivateBoard(false);
+
             if (CheckState()) // If true, it means the game is over
+            {
                 return;
-            FreezeBoard(); // To allow the opponent to move
+            }
             label1.Text = "Opponent's Turn!";
 
 
 
-            if (ManageInput())
-                return;
+            ManageInput();
+
             label1.Text = "Your Turn!";
             if (!CheckState())
-                UnfreezeBoard();
+                ActivateBoard(true);
         }
 
         private void checkWinner(char input)
@@ -162,76 +165,65 @@ namespace Game
 
         public bool Build(byte[] board)
         {
-            button1.ResetButton(board[0], PlayerChar, OpponentChar);
-            button2.ResetButton(board[1], PlayerChar, OpponentChar);
-            button3.ResetButton(board[2], PlayerChar, OpponentChar);
-            button4.ResetButton(board[3], PlayerChar, OpponentChar);
-            button5.ResetButton(board[4], PlayerChar, OpponentChar);
-            button6.ResetButton(board[5], PlayerChar, OpponentChar);
-            button7.ResetButton(board[6], PlayerChar, OpponentChar);
-            button8.ResetButton(board[7], PlayerChar, OpponentChar);
-            button9.ResetButton(board[8], PlayerChar, OpponentChar);
+            var incoming = Encryptor.Decrypt(board);
+            for (int i = 0; i < board.Length; i++)
+            {
+                buttons[i].Text = incoming[i].ToString();
+            }
 
             label1.Text = board[9] == 2 ? "Your Turn" : "Opponent's Turn";
             this.Refresh();
             return board[9] == 1;
         }
 
-        public byte[] Deconstruct()
+        public string Deconstruct()
         {
-            var ret = new byte[10]
-                {
-                    (byte)(button1.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button2.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button3.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button4.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button5.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button6.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button7.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button8.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(button9.Text == PlayerChar.ToString() ? ((byte)1) : 2),
-                    (byte)(label1.Text == "Your Turn" ? ((byte)1) : 2),
-                };
-
-            return ret;
-        }
-
-        private void FreezeBoard()
-        {
-            foreach (var button in buttons)
+            var ret = new StringBuilder();
+            foreach (var button in buttons) 
             {
-                button.Enabled = false;
+                ret.Append(button.Text);
             }
+
+            return ret.ToString();
         }
 
-        private void UnfreezeBoard()
+        private void ActivateBoard(bool toActivate)
         {
             foreach (var button in buttons)
             {
                 if (button.Text == "")
                 {
-                    button.Enabled = true;
-                } 
+                    button.Enabled = toActivate;
+                }
             }
+
+            LoadGame.Enabled = toActivate;
+            SaveGame.Enabled = toActivate;
         }
 
-        public bool ManageInput()
+        public void ManageInput()
         {
-            byte[] buffer = new byte[10];
-            sock.Receive(buffer);
+            var result = sock.ReceiveData();
 
-            if (buffer[9] == 0)
+            if (result.isLoaded) 
             {
-                ReceiveMove(buffer[0]);
-                return false;
+                var turn = PlayerChar.ToString() == buttons.LoadBoardFromData(result.data);
+                if (turn)
+                {
+                    ActivateBoard(true);
+                }
+                else
+                {
+                    ActivateBoard(false);
+                    MessageReceiver.RunWorkerAsync();
+                }   
             }
             else
             {
-                return Build(buffer);
+                ReceiveMove(result.data[0]);
+                MessageReceiver.RunWorkerAsync();
             }
         }
-
-
 
         private void ReceiveMove(byte receive)
         {
@@ -243,6 +235,7 @@ namespace Game
             byte[] num = { 1 };
             sock.Send(num);
             button1.Text = PlayerChar.ToString();
+            button1.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -251,6 +244,7 @@ namespace Game
             byte[] num = { 2 };
             sock.Send(num);
             button2.Text = PlayerChar.ToString();
+            button2.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -259,6 +253,7 @@ namespace Game
             byte[] num = { 3 };
             sock.Send(num);
             button3.Text = PlayerChar.ToString();
+            button3.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -267,6 +262,7 @@ namespace Game
             byte[] num = { 4 };
             sock.Send(num);
             button4.Text = PlayerChar.ToString();
+            button4.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -275,6 +271,7 @@ namespace Game
             byte[] num = { 5 };
             sock.Send(num);
             button5.Text = PlayerChar.ToString();
+            button5.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -283,6 +280,7 @@ namespace Game
             byte[] num = { 6 };
             sock.Send(num);
             button6.Text = PlayerChar.ToString();
+            button6.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -291,6 +289,7 @@ namespace Game
             byte[] num = { 7 };
             sock.Send(num);
             button7.Text = PlayerChar.ToString();
+            button7.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -299,6 +298,7 @@ namespace Game
             byte[] num = { 8 };
             sock.Send(num);
             button8.Text = PlayerChar.ToString();
+            button8.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -307,6 +307,7 @@ namespace Game
             byte[] num = { 9 };
             sock.Send(num);
             button9.Text = PlayerChar.ToString();
+            button9.Enabled = false;
             MessageReceiver.RunWorkerAsync();
         }
 
@@ -390,10 +391,10 @@ namespace Game
             }
 
             // Send a string to the client
-            string messageToSend = Deconstruct().ToString();
-            byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
-            stream.Write(messageBytes, 0, messageBytes.Length);
-            Console.WriteLine($"Received from server: {messageToSend}");
+            sock.SendLoaded(buttons);
+            //byte[] messageBytes = Encryptor.Encrypt(Deconstruct());
+            //stream.Write(messageBytes, 0, messageBytes.Length);
+            //Console.WriteLine($"Received from server: {messageBytes}");
         }
 
         private void SaveGame_Clicked(Object sender, EventArgs e)
