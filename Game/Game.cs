@@ -18,12 +18,14 @@ namespace Game
         private readonly TcpListener server = null;
         private readonly TcpClient client;
         private readonly NetworkStream stream;
+        private Button[] buttons = new Button[9];
 
         public Game(bool isHost, string ip = null)
         {
             InitializeComponent();
             MessageReceiver.DoWork += MessageReceiver_DoWork;
             CheckForIllegalCrossThreadCalls = false;
+            buttons = new [] { button1, button2, button3, button4, button5, button6, button7, button8, button9 };
 
             if (isHost) //Meaning we are the host and the opponent is the guest on our server
             {
@@ -88,127 +90,70 @@ namespace Game
 
         }
 
+        private void checkWinner(char input)
+        {
+            if (input.Equals(PlayerChar))
+            {
+                label1.Text = "You Won!";
+                MessageBox.Show("You Won!");
+            }
+            else
+            {
+                label1.Text = "You Lost!";
+                MessageBox.Show("You Lost!");
+            }
+        }
+
         private bool CheckState()
         {
             //Horizontals
             if (button1.Text == button2.Text && button2.Text == button3.Text && button3.Text != "")
             {
-                if (button1.Text[0] == PlayerChar) //Text[0] is the first char of the button
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button4.Text == button5.Text && button5.Text == button6.Text && button6.Text != "")
             {
-                if (button4.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button4.Text[0]);
                 return true;
             }
 
             else if (button7.Text == button8.Text && button8.Text == button9.Text && button9.Text != "")
             {
-                if (button7.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button7.Text[0]);
                 return true;
             }
 
             //Verticals
             else if (button1.Text == button4.Text && button4.Text == button7.Text && button7.Text != "")
             {
-                if (button1.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button2.Text == button5.Text && button5.Text == button8.Text && button8.Text != "")
             {
-                if (button2.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button2.Text[0]);
+                ;
                 return true;
             }
 
             else if (button3.Text == button6.Text && button6.Text == button9.Text && button9.Text != "")
             {
-                if (button3.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button3.Text[0]);
                 return true;
             }
 
             else if (button1.Text == button5.Text && button5.Text == button9.Text && button9.Text != "")
             {
-                if (button1.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button1.Text[0]);
                 return true;
             }
 
             else if (button3.Text == button5.Text && button5.Text == button7.Text && button7.Text != "")
             {
-                if (button3.Text[0] == PlayerChar)
-                {
-                    label1.Text = "You Won!";
-                    MessageBox.Show("You Won!");
-                }
-                else
-                {
-                    label1.Text = "You Lost!";
-                    MessageBox.Show("You Lost!");
-                }
+                checkWinner(button3.Text[0]);
                 return true;
             }
 
@@ -259,37 +204,21 @@ namespace Game
 
         private void FreezeBoard()
         {
-            button1.Enabled = false;
-            button2.Enabled = false;
-            button3.Enabled = false;
-            button4.Enabled = false;
-            button5.Enabled = false;
-            button6.Enabled = false;
-            button7.Enabled = false;
-            button8.Enabled = false;
-            button9.Enabled = false;
+            foreach (var button in buttons)
+            {
+                button.Enabled = false;
+            }
         }
 
         private void UnfreezeBoard()
         {
-            if (button1.Text == "")
-                button1.Enabled = true;
-            if (button2.Text == "")
-                button2.Enabled = true;
-            if (button3.Text == "")
-                button3.Enabled = true;
-            if (button4.Text == "")
-                button4.Enabled = true;
-            if (button5.Text == "")
-                button5.Enabled = true;
-            if (button6.Text == "")
-                button6.Enabled = true;
-            if (button7.Text == "")
-                button7.Enabled = true;
-            if (button8.Text == "")
-                button8.Enabled = true;
-            if (button9.Text == "")
-                button9.Enabled = true;
+            foreach (var button in buttons)
+            {
+                if (button.Text == "")
+                {
+                    button.Enabled = true;
+                } 
+            }
         }
 
         public bool ManageInput()
@@ -312,25 +241,9 @@ namespace Game
 
         private void ReceiveMove(byte receive)
         {
-            if (receive == 1)
-                button1.Text = OpponentChar.ToString();
-            if (receive == 2)
-                button2.Text = OpponentChar.ToString();
-            if (receive == 3)
-                button3.Text = OpponentChar.ToString();
-            if (receive == 4)
-                button4.Text = OpponentChar.ToString();
-            if (receive == 5)
-                button5.Text = OpponentChar.ToString();
-            if (receive == 6)
-                button6.Text = OpponentChar.ToString();
-            if (receive == 7)
-                button7.Text = OpponentChar.ToString();
-            if (receive == 8)
-                button8.Text = OpponentChar.ToString();
-            if (receive == 9)
-                button9.Text = OpponentChar.ToString();
-
+            byte[] buffer = new byte[1];
+            sock.Receive(buffer);
+            buttons[buffer[0]-1].Text = OpponentChar.ToString();
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -420,24 +333,12 @@ namespace Game
                 MessageBox.Show("No saved game found");
                 return;
             }
-            button1.Text = "";
-            button2.Text = "";
-            button3.Text = "";
-            button4.Text = "";
-            button5.Text = "";
-            button6.Text = "";
-            button7.Text = "";
-            button8.Text = "";
-            button9.Text = "";
-            button1.Enabled = true;
-            button2.Enabled = true;
-            button3.Enabled = true;
-            button4.Enabled = true;
-            button5.Enabled = true;
-            button6.Enabled = true;
-            button7.Enabled = true;
-            button8.Enabled = true;
-            button9.Enabled = true;
+            Button[] buttons = {button1, button2, button3, button4, button5, button6, button7, button8, button9};
+            foreach (Button b in buttons)
+            {
+                b.Text = "";
+                b.Enabled = true;
+            }
 
             // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
             List<ButtonInfo> deserializedList = JsonSerializer.Deserialize<List<ButtonInfo>>(savedGame);
