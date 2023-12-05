@@ -189,25 +189,7 @@ namespace Game
         {
             byte[] buffer = new byte[1];
             sock.Receive(buffer);
-            if (buffer[0] == 1)
-                button1.Text = OpponentChar.ToString();
-            if (buffer[0] == 2)
-                button2.Text = OpponentChar.ToString();
-            if (buffer[0] == 3)
-                button3.Text = OpponentChar.ToString();
-            if (buffer[0] == 4)
-                button4.Text = OpponentChar.ToString();
-            if (buffer[0] == 5)
-                button5.Text = OpponentChar.ToString();
-            if (buffer[0] == 6)
-                button6.Text = OpponentChar.ToString();
-            if (buffer[0] == 7)
-                button7.Text = OpponentChar.ToString();
-            if (buffer[0] == 8)
-                button8.Text = OpponentChar.ToString();
-            if (buffer[0] == 9)
-                button9.Text = OpponentChar.ToString();
-
+            buttons[buffer[0]-1].Text = OpponentChar.ToString();
         }
 
         private void Button1_Click(object sender, EventArgs e)
