@@ -3,8 +3,6 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.ComponentModel;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 using System.Text;
 
@@ -73,7 +71,11 @@ namespace Game
                 return;
             FreezeBoard(); // To allow the opponent to move
             label1.Text = "Opponent's Turn!";
-            ReceiveMove();
+
+
+
+            if (ManageInput())
+                return;
             label1.Text = "Your Turn!";
             if (!CheckState())
                 UnfreezeBoard();
@@ -220,6 +222,41 @@ namespace Game
             return false;
         }
 
+        public bool Build(byte[] board)
+        {
+            button1.ResetButton(board[1], PlayerChar, OpponentChar);
+            button2.ResetButton(board[2], PlayerChar, OpponentChar);
+            button3.ResetButton(board[3], PlayerChar, OpponentChar);
+            button4.ResetButton(board[4], PlayerChar, OpponentChar);
+            button5.ResetButton(board[5], PlayerChar, OpponentChar);
+            button6.ResetButton(board[6], PlayerChar, OpponentChar);
+            button7.ResetButton(board[7], PlayerChar, OpponentChar);
+            button8.ResetButton(board[8], PlayerChar, OpponentChar);
+            button9.ResetButton(board[9], PlayerChar, OpponentChar);
+
+            label1.Text = board[10] == 2 ? "Your Turn" : "Opponent's Turn";
+            return board[10] == 1;
+        }
+
+        public byte[] Deconstruct()
+        {
+            var ret = new byte[10]
+                {
+                    (byte)(button1.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button2.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button3.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button4.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button5.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button6.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button7.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button8.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(button9.Text == PlayerChar.ToString() ? ((byte)1) : 2),
+                    (byte)(label1.Text == "Your Turn" ? ((byte)1) : 2),
+                };
+
+            return ret;
+        }
+
         private void FreezeBoard()
         {
             button1.Enabled = false;
@@ -255,28 +292,43 @@ namespace Game
                 button9.Enabled = true;
         }
 
-
-        private void ReceiveMove()
+        public bool ManageInput()
         {
-            byte[] buffer = new byte[1];
+            byte[] buffer = new byte[10];
             sock.Receive(buffer);
-            if (buffer[0] == 1)
+
+            if (buffer[9] == 0)
+            {
+                ReceiveMove(buffer[0]);
+                return false;
+            }
+            else
+            {
+                return Build(buffer);
+            }
+        }
+
+
+
+        private void ReceiveMove(byte receive)
+        {
+            if (receive == 1)
                 button1.Text = OpponentChar.ToString();
-            if (buffer[0] == 2)
+            if (receive == 2)
                 button2.Text = OpponentChar.ToString();
-            if (buffer[0] == 3)
+            if (receive == 3)
                 button3.Text = OpponentChar.ToString();
-            if (buffer[0] == 4)
+            if (receive == 4)
                 button4.Text = OpponentChar.ToString();
-            if (buffer[0] == 5)
+            if (receive == 5)
                 button5.Text = OpponentChar.ToString();
-            if (buffer[0] == 6)
+            if (receive == 6)
                 button6.Text = OpponentChar.ToString();
-            if (buffer[0] == 7)
+            if (receive == 7)
                 button7.Text = OpponentChar.ToString();
-            if (buffer[0] == 8)
+            if (receive == 8)
                 button8.Text = OpponentChar.ToString();
-            if (buffer[0] == 9)
+            if (receive == 9)
                 button9.Text = OpponentChar.ToString();
 
         }
@@ -445,22 +497,22 @@ namespace Game
             }
 
             // Send a string to the client
-            string messageToSend = "Hello, client!";
+            string messageToSend = Deconstruct().ToString();
             byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
             stream.Write(messageBytes, 0, messageBytes.Length);
             Console.WriteLine($"Received from server: {messageToSend}");
-
         }
 
         private void SaveGame_Clicked(Object sender, EventArgs e)
         {
             List<ButtonInfo> buttonInfoList = new List<ButtonInfo>();
+ 
+
            // IContainer c = this.components;
             foreach (Control control in this.Controls)
             {
-                if (control is Button)
+                if (control is Button b)
                 {
-                    Button b = (Button)control;
                     buttonInfoList.Add(new ButtonInfo { Name = b.Name, Text = b.Text });
                 }
             }
