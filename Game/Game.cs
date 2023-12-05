@@ -55,7 +55,7 @@ namespace Game
                     sock = client.Client;
 
                     // Get the network stream
-                    NetworkStream stream = client.GetStream();
+                    stream = client.GetStream();
 
                     MessageReceiver.RunWorkerAsync(); //To recieve the move of the opponent. This will call the DoWork method
                 }
@@ -162,18 +162,19 @@ namespace Game
 
         public bool Build(byte[] board)
         {
-            button1.ResetButton(board[1], PlayerChar, OpponentChar);
-            button2.ResetButton(board[2], PlayerChar, OpponentChar);
-            button3.ResetButton(board[3], PlayerChar, OpponentChar);
-            button4.ResetButton(board[4], PlayerChar, OpponentChar);
-            button5.ResetButton(board[5], PlayerChar, OpponentChar);
-            button6.ResetButton(board[6], PlayerChar, OpponentChar);
-            button7.ResetButton(board[7], PlayerChar, OpponentChar);
-            button8.ResetButton(board[8], PlayerChar, OpponentChar);
-            button9.ResetButton(board[9], PlayerChar, OpponentChar);
+            button1.ResetButton(board[0], PlayerChar, OpponentChar);
+            button2.ResetButton(board[1], PlayerChar, OpponentChar);
+            button3.ResetButton(board[2], PlayerChar, OpponentChar);
+            button4.ResetButton(board[3], PlayerChar, OpponentChar);
+            button5.ResetButton(board[4], PlayerChar, OpponentChar);
+            button6.ResetButton(board[5], PlayerChar, OpponentChar);
+            button7.ResetButton(board[6], PlayerChar, OpponentChar);
+            button8.ResetButton(board[7], PlayerChar, OpponentChar);
+            button9.ResetButton(board[8], PlayerChar, OpponentChar);
 
-            label1.Text = board[10] == 2 ? "Your Turn" : "Opponent's Turn";
-            return board[10] == 1;
+            label1.Text = board[9] == 2 ? "Your Turn" : "Opponent's Turn";
+            this.Refresh();
+            return board[9] == 1;
         }
 
         public byte[] Deconstruct()
