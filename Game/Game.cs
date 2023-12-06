@@ -181,30 +181,6 @@ namespace Game
             return false;
         }
 
-        public bool Build(byte[] board)
-        {
-            var incoming = Encryptor.Decrypt(board);
-            for (int i = 0; i < board.Length; i++)
-            {
-                buttons[i].Text = incoming[i].ToString();
-            }
-
-            label1.Text = board[9] == 2 ? "Your Turn" : "Opponent's Turn";
-            this.Refresh();
-            return board[9] == 1;
-        }
-
-        public string Deconstruct()
-        {
-            var ret = new StringBuilder();
-            foreach (var button in buttons) 
-            {
-                ret.Append(button.Text);
-            }
-
-            return ret.ToString();
-        }
-
         private void ActivateBoard(bool toActivate)
         {
             foreach (var button in buttons)
@@ -242,11 +218,6 @@ namespace Game
                 buttons.ApplyMove(result.data, OpponentChar.ToString());
                 return false;
             }
-        }
-
-        private void ReceiveMove(byte receive)
-        {
-            buttons[receive - 1].Text = OpponentChar.ToString();
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -437,7 +408,7 @@ namespace Game
             //stream.Write(messageBytes, 0, messageBytes.Length);
             //Console.WriteLine($"Received from server: {messageBytes}");
 
-            if ((PlayerChar == 'O' && !(playerCount < opponentCount)) || (PlayerChar == 'X' && playerCount > opponentCount))
+            if ((PlayerChar == 'O' && !(playerCount < opponentCount)) || (PlayerChar == 'X' && playerCount <= opponentCount))
             {
                 BeginPlayerTurn();
             }
