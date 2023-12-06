@@ -29,8 +29,8 @@ namespace Game
 
             if (isHost) //Meaning we are the host and the opponent is the guest on our server
             {
-                PlayerChar = 'X';
-                OpponentChar = 'O';
+                PlayerChar = 'O';
+                OpponentChar = 'X';
                 try
                 {
                     server = new TcpListener(System.Net.IPAddress.Any, 8080);
@@ -47,8 +47,8 @@ namespace Game
             }
             else
             {
-                PlayerChar = 'O';
-                OpponentChar = 'X';
+                PlayerChar = 'X';
+                OpponentChar = 'O';
                 try
                 {
                     client = new TcpClient(ip, 8080); //We are the 'guest'
@@ -69,18 +69,36 @@ namespace Game
 
         private void MessageReceiver_DoWork(object sender, DoWorkEventArgs e)
         {
+            bool repeat = true;
+            while (repeat)
+            {
+                var result = BeginOpponentTurn();
+                repeat = result.repeat;
+                if (result.gameOver)
+                {
+                    return;
+                }
+            }
+
+            BeginPlayerTurn();
+        }
+
+        private (bool gameOver, bool repeat) BeginOpponentTurn()
+        {
             ActivateBoard(false);
 
             if (CheckState()) // If true, it means the game is over
             {
-                return;
+                return (true,false);
             }
             label1.Text = "Opponent's Turn!";
 
 
+            return (false, ManageInput());
+        }
 
-            ManageInput();
-
+        private void BeginPlayerTurn()
+        {
             label1.Text = "Your Turn!";
             if (!CheckState())
                 ActivateBoard(true);
@@ -201,7 +219,7 @@ namespace Game
             SaveGame.Enabled = toActivate;
         }
 
-        public void ManageInput()
+        public bool ManageInput()
         {
             var result = sock.ReceiveData();
 
@@ -211,17 +229,18 @@ namespace Game
                 if (turn)
                 {
                     ActivateBoard(true);
+                    return false;
                 }
                 else
                 {
                     ActivateBoard(false);
-                    MessageReceiver.RunWorkerAsync();
+                    return true;
                 }   
             }
             else
             {
-                ReceiveMove(result.data[0]);
-                MessageReceiver.RunWorkerAsync();
+                buttons.ApplyMove(result.data, OpponentChar.ToString());
+                return false;
             }
         }
 
@@ -232,8 +251,8 @@ namespace Game
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            byte[] num = { 1 };
-            sock.Send(num);
+            byte num =  1 ;
+            sock.SendMove(num);
             button1.Text = PlayerChar.ToString();
             button1.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -241,8 +260,8 @@ namespace Game
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            byte[] num = { 2 };
-            sock.Send(num);
+            byte num =  2;
+            sock.SendMove(num);
             button2.Text = PlayerChar.ToString();
             button2.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -250,8 +269,8 @@ namespace Game
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            byte[] num = { 3 };
-            sock.Send(num);
+            byte num = 3;
+            sock.SendMove(num);
             button3.Text = PlayerChar.ToString();
             button3.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -259,8 +278,8 @@ namespace Game
 
         private void Button4_Click(object sender, EventArgs e)
         {
-            byte[] num = { 4 };
-            sock.Send(num);
+            byte num = 4;
+            sock.SendMove(num);
             button4.Text = PlayerChar.ToString();
             button4.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -268,8 +287,8 @@ namespace Game
 
         private void Button5_Click(object sender, EventArgs e)
         {
-            byte[] num = { 5 };
-            sock.Send(num);
+            byte num = 5;
+            sock.SendMove(num);
             button5.Text = PlayerChar.ToString();
             button5.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -277,8 +296,8 @@ namespace Game
 
         private void Button6_Click(object sender, EventArgs e)
         {
-            byte[] num = { 6 };
-            sock.Send(num);
+            byte num = 6;
+            sock.SendMove(num);
             button6.Text = PlayerChar.ToString();
             button6.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -286,8 +305,8 @@ namespace Game
 
         private void Button7_Click(object sender, EventArgs e)
         {
-            byte[] num = { 7 };
-            sock.Send(num);
+            byte num = 7;
+            sock.SendMove(num);
             button7.Text = PlayerChar.ToString();
             button7.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -295,8 +314,8 @@ namespace Game
 
         private void Button8_Click(object sender, EventArgs e)
         {
-            byte[] num = { 8 };
-            sock.Send(num);
+            byte num = 8;
+            sock.SendMove(num);
             button8.Text = PlayerChar.ToString();
             button8.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -304,8 +323,8 @@ namespace Game
 
         private void Button9_Click(object sender, EventArgs e)
         {
-            byte[] num = { 9 };
-            sock.Send(num);
+            byte num = 9;
+            sock.SendMove(num);
             button9.Text = PlayerChar.ToString();
             button9.Enabled = false;
             MessageReceiver.RunWorkerAsync();
@@ -335,54 +354,76 @@ namespace Game
 
             // Deserialize the JSON string to a dictionary using System.Text.Json.JsonSerializer
             List<ButtonInfo> deserializedList = JsonSerializer.Deserialize<List<ButtonInfo>>(savedGame);
+            var playerCount = 0;
+            var opponentCount = 0;
             string name;
             foreach (ButtonInfo b in deserializedList)
             {
+                if (b.Text == "")
+                    continue;
                 name = b.Name;
                 if (name == "button1")
                 {
-                    button1.Text = b.Text;
-                    button1.Enabled = false;
+                    if (button1.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button2")
                 {
-                    button2.Text = b.Text;
-                    button2.Enabled = false;
+                    if (button2.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button3")
                 {
-                    button3.Text = b.Text;
-                    button3.Enabled = false;
+                    if (button3.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button4")
                 {
-                    button4.Text = b.Text;
-                    button4.Enabled = false;
+                    if (button4.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button5")
                 {
-                    button5.Text = b.Text;
-                    button5.Enabled = false;
+                    if (button5.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button6")
                 {
-                    button6.Text = b.Text;
-                    button6.Enabled = false;
+                    if (button6.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button7")
                 {
-                    button7.Text = b.Text;
-                    button7.Enabled = false;
+                    if (button7.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button8")
                 {
-                    button8.Text = b.Text;
-                    button8.Enabled = false;
+                    if (button8.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else if (name == "button9")
                 {
-                    button9.Text = b.Text;
-                    button9.Enabled = false;
+                    if (button9.UpdateButton(b.Text, PlayerChar.ToString(), OpponentChar.ToString()))
+                        playerCount++;
+                    else
+                        opponentCount++;
                 }
                 else
                 {
@@ -395,6 +436,21 @@ namespace Game
             //byte[] messageBytes = Encryptor.Encrypt(Deconstruct());
             //stream.Write(messageBytes, 0, messageBytes.Length);
             //Console.WriteLine($"Received from server: {messageBytes}");
+
+            if ((PlayerChar == 'O' && !(playerCount < opponentCount)) || (PlayerChar == 'X' && playerCount > opponentCount))
+            {
+                BeginPlayerTurn();
+            }
+            else
+            {
+                var cont = true;
+                do
+                {
+                    var vars = BeginOpponentTurn();
+                    cont = vars.repeat && !vars.gameOver;
+                }
+                while (cont);
+            }
         }
 
         private void SaveGame_Clicked(Object sender, EventArgs e)

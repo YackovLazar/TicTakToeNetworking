@@ -101,7 +101,7 @@ namespace Game
 
             var decrypted = Encryptor.Decrypt(received);
 
-            return (received, decrypted[15] == 0);
+            return (decrypted, decrypted[15] == 0);
         }
     }
 }
