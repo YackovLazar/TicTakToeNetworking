@@ -76,10 +76,8 @@ namespace Game
                 return;
             }
             label1.Text = "Opponent's Turn!";
-
-
-
-            ManageInput();
+             var result = sock.ReceiveData();
+            ReceiveMove(result.data[0]);
 
             label1.Text = "Your Turn!";
             if (!CheckState())
