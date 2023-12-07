@@ -17,26 +17,6 @@ namespace Game
                     return encryptor.TransformFinalBlock(data, 0, data.Length);
             }
 
-           // byte[] encrypted;
-           // using (var rijndaelManaged = new System.Security.Cryptography.RijndaelManaged())
-           // {
-           //     rijndaelManaged.KeySize = 128;
-            //    rijndaelManaged.Key = Key;
-            //    rijndaelManaged.IV = IV;
-            //    var encryptor = rijndaelManaged.CreateEncryptor(rijndaelManaged.Key, rijndaelManaged.IV);
-            //    using (var memoryStream = new System.IO.MemoryStream())
-           //     {
-           //         using (var cryptoStream = new System.Security.Cryptography.CryptoStream(memoryStream, encryptor, System.Security.Cryptography.CryptoStreamMode.Write))
-            //        {
-            //            using (var streamWriter = new System.IO.StreamWriter(cryptoStream))
-            //            {
-            //                streamWriter.Write(plainText);
-            //            }
-            //            encrypted = memoryStream.ToArray();
-            //        }
-            //    }
-            //}
-            //return Convert.ToBase64String(encrypted);
         }
 
         internal static byte[] Decrypt(byte[] cipherText)
@@ -49,26 +29,6 @@ namespace Game
                     return decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
                 }
             }
-
-            //byte[] cipherBytes = Convert.FromBase64String(cipherText);
-            //string decrypted;
-            //using (var rijndaelManaged = new System.Security.Cryptography.RijndaelManaged())
-            //{
-            //    rijndaelManaged.Key = Key;
-            //    rijndaelManaged.IV = IV;
-            //    var decryptor = rijndaelManaged.CreateDecryptor(rijndaelManaged.Key, rijndaelManaged.IV);
-            //    using (var memoryStream = new System.IO.MemoryStream(cipherBytes))
-            //    {
-             //       using (var cryptoStream = new System.Security.Cryptography.CryptoStream(memoryStream, decryptor, System.Security.Cryptography.CryptoStreamMode.Read))
-             //       {
-            //            using (var streamReader = new System.IO.StreamReader(cryptoStream))
-            //            {
-            //                decrypted = streamReader.ReadToEnd();
-             //           }
-             //       }
-            //    }
-            //}
-            //return decrypted;
         }
     }
 }
